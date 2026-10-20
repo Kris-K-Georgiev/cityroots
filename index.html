@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CityRoots</title>
+<meta name="description" content="CityRoots: a free city builder in a watercolour sketchbook. Draw curved streets, grow districts, shape the land. For Windows and Mac.">
+<meta property="og:title" content="CityRoots">
+<meta property="og:description" content="A free city builder in a watercolour sketchbook. Windows and Mac.">
+<meta property="og:image" content="assets/hero.jpg">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Pangolin&display=swap">
+<style>
+/* Layout: the game's sketchbook. A full-bleed key-art hero with the logo on a taped sheet, then pages of the
+   journal: what you do, taped screenshots, how to install, the small print. One deliberate paper look. */
+:root {
+  --page: #f3eddf;        /* the sketchbook page */
+  --sheet: #fbf8f0;       /* a lighter sheet */
+  --ink: #2f3542;         /* graphite */
+  --muted: #5d6470;
+  --line: #d8cfbd;
+  --accent: #2c5f9e;      /* cobalt wash */
+  --accent-dark: #24508a;
+  --leaf: #6fa85a;
+  --wash: #bcd8cc;
+  --tape: rgba(232, 219, 181, .85);
+  --dots: rgba(47, 53, 66, .12);
+  --f-head: "Pangolin", "Comic Sans MS", cursive;
+  --f-body: "Andika", "Segoe UI", system-ui, sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; background: var(--page); color: var(--ink); font: 17px/1.6 var(--f-body);
+  background-image: radial-gradient(var(--dots) 1px, transparent 1.3px); background-size: 22px 22px;
+}
+img { max-width: 100%; height: auto; display: block; }
+a { color: var(--accent); }
+a:focus-visible, button:focus-visible { outline: 3px dashed var(--accent); outline-offset: 3px; }
+h1, h2, h3 { font-family: var(--f-head); font-weight: 400; margin: 0; line-height: 1.15; text-wrap: balance; }
+h2 { font-size: clamp(30px, 4vw, 42px); }
+h3 { font-size: 24px; }
+p { margin: 0; max-width: 62ch; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(18px, env(safe-area-inset-left, 0px)); padding-right: max(18px, env(safe-area-inset-right, 0px)); }
+
+/* a taped paper sheet */
+.sheet { background: var(--sheet); border-radius: 3px; position: relative; box-shadow: 0 1px 0 rgba(0,0,0,.05), 0 10px 26px rgba(47,53,66,.14); }
+.sheet::before, .sheet::after { content: ""; position: absolute; top: -10px; width: 70px; height: 20px; background: var(--tape); z-index: 2; }
+.sheet::before { left: 18px; transform: rotate(-5deg); }
+.sheet::after { right: 18px; transform: rotate(4deg); }
+
+/* top bar */
+.bar { position: absolute; inset: 0 0 auto 0; z-index: 5; padding-top: env(safe-area-inset-top, 0px); }
+.bar .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 14px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); background: var(--sheet); padding: 6px 12px 6px 8px; border-radius: 3px; box-shadow: 0 4px 12px rgba(0,0,0,.18); font: 400 22px/1 var(--f-head); }
+.brand img { width: 30px; height: 30px; }
+.lang { display: flex; gap: 4px; background: var(--sheet); padding: 4px; border-radius: 3px; box-shadow: 0 4px 12px rgba(0,0,0,.18); }
+.lang button { font: 700 13px/1 var(--f-body); border: 0; background: transparent; color: var(--ink); padding: 7px 10px; border-radius: 2px; cursor: pointer; letter-spacing: .04em; }
+.lang button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+
+/* hero */
+.hero { position: relative; min-height: min(92vh, 860px); display: grid; align-items: center; overflow: hidden; }
+.hero-art { position: absolute; inset: 0; background: #ccc url("assets/hero.jpg") center / cover no-repeat; }
+.hero-art::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(20,16,12,.38), rgba(20,16,12,0) 60%), linear-gradient(0deg, var(--page) 0, rgba(243,237,223,0) 120px); }
+.hero .wrap { position: relative; z-index: 1; width: 100%; padding-block: 110px 90px; }
+.card { max-width: 520px; padding: 34px 34px 30px; transform: rotate(-1.2deg); display: grid; gap: 18px; }
+.tag { font: 400 20px/1.3 var(--f-head); color: var(--accent-dark); }
+.lead { color: var(--muted); }
+
+/* the logo with its rolling, hand-drawn tyres */
+.logo { position: relative; width: 100%; aspect-ratio: 1295 / 291; }
+.logo > img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.tyre { position: absolute; top: 35.05%; width: 10.35%; aspect-ratio: 1; animation: roll 7s linear infinite; }
+.tyre.a { left: 53.04%; } .tyre.b { left: 64.63%; animation-delay: -1.3s; }
+.tyre img { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; animation: boil .43s steps(1) infinite; }
+.tyre img:nth-child(2) { animation-delay: -.143s; } .tyre img:nth-child(3) { animation-delay: -.286s; }
+@keyframes roll { to { transform: rotate(360deg); } }
+@keyframes boil { 0% { opacity: 1; } 33.3% { opacity: 0; } }
+
+/* download buttons */
+.dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.btn { display: flex; align-items: center; gap: 12px; text-decoration: none; padding: 13px 16px; border-radius: 3px; border: 2px solid var(--ink); background: var(--sheet); color: var(--ink); position: relative; transition: transform .12s, box-shadow .12s; }
+.btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 rgba(47,53,66,.18); }
+.btn.primary { background: var(--accent); border-color: var(--accent-dark); color: #fff; }
+.btn svg { width: 30px; height: 30px; flex: none; }
+.btn b { display: block; font: 400 21px/1.1 var(--f-head); }
+.btn small { display: block; font-size: 13px; opacity: .85; font-variant-numeric: tabular-nums; }
+.alt { font-size: 14px; color: var(--muted); }
+.alt a { color: var(--muted); }
+
+/* sections */
+section { padding-block: 70px; }
+.intro { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 46px; align-items: center; }
+.washed { position: relative; display: inline-block; }
+.washed::before { content: ""; position: absolute; left: -12px; right: -14px; top: 18%; bottom: 4%; background: var(--wash); border-radius: 46% 54% 50% 50% / 60% 52% 48% 40%; z-index: -1; opacity: .8; }
+.stack { display: grid; gap: 16px; }
+.photo { padding: 10px 10px 34px; transform: rotate(1.5deg); }
+.photo img { border-radius: 2px; }
+.photo figcaption { position: absolute; left: 0; right: 0; bottom: 8px; text-align: center; font: 400 17px/1 var(--f-head); color: var(--muted); }
+
+.features { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 30px 26px; margin-top: 38px; }
+.feature { padding: 12px 12px 18px; display: grid; gap: 10px; align-content: start; }
+.feature:nth-child(3n+1) { transform: rotate(-1deg); } .feature:nth-child(3n+2) { transform: rotate(.8deg); } .feature:nth-child(3n) { transform: rotate(-.4deg); }
+.feature img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 2px; }
+.feature h3 { padding: 0 6px; }
+.feature p { padding: 0 6px; color: var(--muted); font-size: 15.5px; }
+
+.list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 34px; margin-top: 26px; padding: 0; list-style: none; }
+.list li { position: relative; padding-left: 28px; }
+.list li::before { content: ""; position: absolute; left: 2px; top: .55em; width: 14px; height: 9px; border-left: 3px solid var(--leaf); border-bottom: 3px solid var(--leaf); transform: rotate(-45deg); }
+
+.install { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px; margin-top: 34px; }
+.install .sheet { padding: 28px; display: grid; gap: 12px; align-content: start; }
+.install ol { margin: 0; padding-left: 22px; display: grid; gap: 6px; }
+.note { background: #f6e3a1; padding: 10px 14px; font-size: 15px; transform: rotate(-.6deg); box-shadow: 0 3px 8px rgba(0,0,0,.1); }
+kbd { font: 700 13px/1 var(--f-body); border: 1.5px solid var(--ink); border-bottom-width: 3px; border-radius: 4px; padding: 2px 6px; background: var(--sheet); }
+
+.reqs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 34px; margin-top: 18px; }
+.reqs dl { margin: 0; display: grid; grid-template-columns: 120px 1fr; gap: 6px 14px; }
+.reqs dt { font-weight: 700; } .reqs dd { margin: 0; color: var(--muted); }
+
+.cta { text-align: center; display: grid; justify-items: center; gap: 18px; padding: 44px 28px; }
+.cta .dl { width: min(560px, 100%); }
+
+footer { padding-block: 34px 50px; padding-bottom: max(50px, env(safe-area-inset-bottom, 0px)); color: var(--muted); font-size: 14px; border-top: 1.5px dashed var(--line); }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 10px 26px; justify-content: space-between; }
+
+@media (max-width: 860px) {
+  .intro, .install, .reqs { grid-template-columns: 1fr; }
+  .features { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .list { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .features, .dl { grid-template-columns: 1fr; }
+  .card { padding: 26px 22px 24px; transform: none; }
+  .hero .wrap { padding-block: 96px 70px; }
+  .reqs dl { grid-template-columns: 96px 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tyre, .tyre img { animation: none; } .tyre img:first-child { opacity: 1; }
+  .btn { transition: none; } html { scroll-behavior: auto; }
+}
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="assets/icon.png" alt="" width="30" height="30">CityRoots</a>
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" data-set="en" aria-pressed="true">EN</button>
+      <button type="button" data-set="bg" aria-pressed="false">BG</button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero" style="padding:0">
+    <div class="hero-art" role="img" aria-label="A CityRoots town at golden hour: tower blocks, trees and a boulevard"></div>
+    <div class="wrap">
+      <div class="card sheet">
+        <div class="logo" role="img" aria-label="CityRoots">
+          <img src="assets/logo_bare.png" alt="" width="1295" height="291">
+          <span class="tyre a" aria-hidden="true"><img src="assets/tyre_0.png" alt=""><img src="assets/tyre_1.png" alt=""><img src="assets/tyre_2.png" alt=""></span>
+          <span class="tyre b" aria-hidden="true"><img src="assets/tyre_1.png" alt=""><img src="assets/tyre_2.png" alt=""><img src="assets/tyre_0.png" alt=""></span>
+        </div>
+        <p class="tag" data-i18n="tag">Build it. Shape it. Expand it.</p>
+        <p class="lead" data-i18n="lead">A city builder drawn in a watercolour sketchbook. Lay curved streets, paint districts, shape the land and watch your town grow through the seasons. Free, for Windows and Mac.</p>
+        <div class="dl">
+          <a class="btn primary" href="https://github.com/Kris-K-Georgiev/cityroots/releases/download/v2.1.2/Cityroots-Setup-2.1.2.exe">
+            <svg viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M3 6.5l10.5-1.4v10.3H3zM14.6 4.9L29 3v12.4H14.6zM3 16.6h10.5v10.3L3 25.5zM14.6 16.6H29V29l-14.4-2z"/></svg>
+            <span><b data-i18n="win">Windows</b><small data-i18n="winsize">Installer · 85 MB</small></span>
+          </a>
+          <a class="btn" href="https://github.com/Kris-K-Georgiev/cityroots/releases/download/v2.1.2/Cityroots-2.1.2.dmg">
+            <svg viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M21.6 16.9c0-3.2 2.6-4.7 2.7-4.8-1.5-2.2-3.8-2.5-4.6-2.5-2-.2-3.8 1.2-4.8 1.2s-2.5-1.1-4.2-1.1C8.6 9.7 6.6 11 5.5 13c-2.2 3.9-.6 9.7 1.6 12.8 1.1 1.5 2.3 3.3 4 3.2 1.6-.1 2.2-1 4.1-1s2.5 1 4.2 1c1.7 0 2.8-1.6 3.8-3.1 1.2-1.8 1.7-3.5 1.7-3.6-.1 0-3.3-1.3-3.3-5.4zM18.5 7.4c.9-1.1 1.5-2.6 1.3-4.1-1.3.1-2.8.9-3.7 1.9-.8.9-1.5 2.4-1.3 3.9 1.4.1 2.9-.7 3.7-1.7z"/></svg>
+            <span><b data-i18n="mac">macOS</b><small data-i18n="macsize">Disk image · 84 MB</small></span>
+          </a>
+        </div>
+        <p class="alt"><span data-i18n="version">Version 2.1.2 · Intel and Apple Silicon Macs ·</span> <a href="https://github.com/Kris-K-Georgiev/cityroots/releases/download/v2.1.2/Cityroots-2.1.2-win64.zip" data-i18n="zip">Windows without installing (.zip)</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap intro">
+      <div class="stack">
+        <h2><span class="washed" data-i18n="h_free">Streets that bend, towns that grow</span></h2>
+        <p data-i18n="p_free1">Draw streets at any angle, in curves or freehand. Junctions round themselves off, roundabouts are real rings, and roads climb hills with banks and cuttings instead of floating on top.</p>
+        <p data-i18n="p_free2">Zone homes, shops, offices and industry along them, or place hand-picked buildings from a gallery of real-world styles: low, mid or high rise, wall to wall or detached.</p>
+      </div>
+      <figure class="photo sheet" style="margin:0"><img src="assets/city.jpg" alt="Tower blocks, red roofs and tall trees in a grown CityRoots town" width="1400" height="788"><figcaption data-i18n="cap_city">Downtown, five o'clock</figcaption></figure>
+    </div>
+  </section>
+
+  <section style="padding-top:20px">
+    <div class="wrap">
+      <h2 data-i18n="h_feat">What's in the sketchbook</h2>
+      <div class="features">
+        <article class="feature sheet"><img src="assets/roads.jpg" alt="A boulevard with planted medians crossing another, with rounded kerbs and zebra crossings" width="1152" height="648"><h3 data-i18n="f1h">Roads like the real thing</h3><p data-i18n="f1p">Boulevards with planted medians, rounded kerbs, zebra crossings and a preview that shows exactly what will be built.</p></article>
+        <article class="feature sheet"><img src="assets/winter.jpg" alt="A snowy town with bare trees and houses under snow" width="1152" height="648"><h3 data-i18n="f2h">Four seasons</h3><p data-i18n="f2p">Blossom in spring, leaves in autumn, snow on every roof in winter, and the music follows the hour and the season.</p></article>
+        <article class="feature sheet"><img src="assets/harbor.jpg" alt="A harbour with cranes, containers and a ship" width="1152" height="648"><h3 data-i18n="f3h">Services from real buildings</h3><p data-i18n="f3p">Fire stations, hospitals, stations, harbours, stadiums and power plants, each modelled on real places.</p></article>
+        <article class="feature sheet"><img src="assets/flags.jpg" alt="The flag maker: a blue flag with a yellow Nordic cross and a ship" width="1152" height="648"><h3 data-i18n="f4h">Your own flag</h3><p data-i18n="f4p">Five patterns, five shapes, ten emblems and any colour. It flies on the town's flagpoles and district banners.</p></article>
+        <article class="feature sheet"><img src="assets/tree.jpg" alt="The city tree: stages along the top, branches as lanes of nodes" width="1152" height="648"><h3 data-i18n="f5h">The city tree</h3><p data-i18n="f5p">Fourteen stages from hamlet to megalopolis, 22 branches to grow and grafts that mix two of them.</p></article>
+        <article class="feature sheet"><img src="assets/hero.jpg" alt="A tree-lined boulevard through a busy downtown" width="1920" height="1080"><h3 data-i18n="f6h">A city that lives</h3><p data-i18n="f6p">Traffic, buses, trams and people on the pavements; councils, budgets, festivals and the occasional flood.</p></article>
+      </div>
+      <ul class="list">
+        <li data-i18n="l1">A guided start that you can skip at any time</li>
+        <li data-i18n="l2">Free camera: turn, tilt down to street level, zoom to the cursor</li>
+        <li data-i18n="l3">Terraforming, auto-levelled lots and bridges of five kinds</li>
+        <li data-i18n="l4">Nine languages, including Bulgarian</li>
+        <li data-i18n="l5">A day takes 5 minutes at normal speed, 2.5 at the fastest</li>
+        <li data-i18n="l6">Graphics presets for laptops and big screens; fullscreen with F11</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="install" style="padding-top:20px">
+    <div class="wrap">
+      <h2 data-i18n="h_inst">Installing</h2>
+      <div class="install">
+        <div class="sheet">
+          <h3>Windows</h3>
+          <ol>
+            <li data-i18n="w1">Download <b>Cityroots-Setup-2.1.2.exe</b> and open it.</li>
+            <li data-i18n="w2">If Windows says it protected your PC, choose <b>More info</b>, then <b>Run anyway</b>. The game is not signed with a paid certificate yet.</li>
+            <li data-i18n="w3">Follow the installer; CityRoots appears in the Start menu.</li>
+          </ol>
+        </div>
+        <div class="sheet">
+          <h3>macOS</h3>
+          <ol>
+            <li data-i18n="m1">Download <b>Cityroots-2.1.2.dmg</b> and open it.</li>
+            <li data-i18n="m2">Drag <b>Cityroots</b> onto <b>Applications</b>.</li>
+            <li data-i18n="m3">The first time, right-click the app in Applications and choose <b>Open</b>, then <b>Open</b> again. After that it opens normally.</li>
+          </ol>
+          <p class="note" data-i18n="m_note">macOS 10.13 or later. One app for Intel and Apple Silicon.</p>
+        </div>
+      </div>
+      <div class="reqs">
+        <dl>
+          <dt data-i18n="r_os">System</dt><dd>Windows 10/11 64-bit · macOS 10.13+</dd>
+          <dt data-i18n="r_gpu">Graphics</dt><dd data-i18n="r_gpu_v">Vulkan or Metal; integrated graphics on Low or Medium</dd>
+        </dl>
+        <dl>
+          <dt data-i18n="r_mem">Memory</dt><dd>8 GB RAM</dd>
+          <dt data-i18n="r_disk">Disk</dt><dd>400 MB</dd>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding-top:10px">
+    <div class="wrap">
+      <div class="cta sheet">
+        <h2 data-i18n="h_cta">Found your town</h2>
+        <p class="lead" data-i18n="p_cta">Free to download and play.</p>
+        <div class="dl">
+          <a class="btn primary" href="https://github.com/Kris-K-Georgiev/cityroots/releases/download/v2.1.2/Cityroots-Setup-2.1.2.exe"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M3 6.5l10.5-1.4v10.3H3zM14.6 4.9L29 3v12.4H14.6zM3 16.6h10.5v10.3L3 25.5zM14.6 16.6H29V29l-14.4-2z"/></svg><span><b data-i18n="win">Windows</b><small data-i18n="winsize">Installer · 85 MB</small></span></a>
+          <a class="btn" href="https://github.com/Kris-K-Georgiev/cityroots/releases/download/v2.1.2/Cityroots-2.1.2.dmg"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M21.6 16.9c0-3.2 2.6-4.7 2.7-4.8-1.5-2.2-3.8-2.5-4.6-2.5-2-.2-3.8 1.2-4.8 1.2s-2.5-1.1-4.2-1.1C8.6 9.7 6.6 11 5.5 13c-2.2 3.9-.6 9.7 1.6 12.8 1.1 1.5 2.3 3.3 4 3.2 1.6-.1 2.2-1 4.1-1s2.5 1 4.2 1c1.7 0 2.8-1.6 3.8-3.1 1.2-1.8 1.7-3.5 1.7-3.6-.1 0-3.3-1.3-3.3-5.4zM18.5 7.4c.9-1.1 1.5-2.6 1.3-4.1-1.3.1-2.8.9-3.7 1.9-.8.9-1.5 2.4-1.3 3.9 1.4.1 2.9-.7 3.7-1.7z"/></svg><span><b data-i18n="mac">macOS</b><small data-i18n="macsize">Disk image · 84 MB</small></span></a>
+        </div>
+        <p class="alt"><a href="https://github.com/Kris-K-Georgiev/cityroots/releases" data-i18n="all">All versions and release notes</a></p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 CityRoots</span>
+    <span data-i18n="credits">Made with Godot. Fonts: Pangolin and Andika (SIL OFL).</span>
+  </div>
+</footer>
+
+<script>
+const BG = {
+  tag: "Строй. Оформяй. Разширявай.",
+  lead: "Градостроителна игра, нарисувана в акварелен скицник. Чертай извити улици, рисувай квартали, оформяй терена и гледай как градът ти расте през сезоните. Безплатна, за Windows и Mac.",
+  win: "Windows", winsize: "Инсталатор · 85 MB", mac: "macOS", macsize: "Дисков образ · 84 MB",
+  version: "Версия 2.1.2 · за Mac с Intel и Apple Silicon ·", zip: "Windows без инсталиране (.zip)",
+  h_free: "Улици, които завиват, градове, които растат",
+  p_free1: "Чертай улици под всякакъв ъгъл, извити или на ръка. Кръстовищата се закръглят сами, кръговите са истински пръстени, а пътищата се изкачват по хълмовете с насипи и изкопи, вместо да лежат отгоре.",
+  p_free2: "Зонирай жилища, магазини, офиси и индустрия покрай тях или поставяй сгради от галерия с реални стилове: ниско, средно или високо строителство, стена до стена или свободно стоящи.",
+  cap_city: "Центърът, пет следобед",
+  h_feat: "Какво има в скицника",
+  f1h: "Пътища като истинските", f1p: "Булеварди със зелени разделителни ивици, закръглени бордюри, пешеходни пътеки и преглед, който показва точно какво ще се построи.",
+  f2h: "Четири сезона", f2p: "Цвят напролет, листа наесен, сняг по всеки покрив през зимата, а музиката следва часа и сезона.",
+  f3h: "Обществени сгради по реални образци", f3p: "Пожарни, болници, гари, пристанища, стадиони и централи, всяка по истински сгради.",
+  f4h: "Твое знаме", f4p: "Пет шарки, пет форми, десет герба и всякакъв цвят. Вее се по пилоните в града и по банерите на кварталите.",
+  f5h: "Дървото на града", f5p: "Четиринадесет етапа от селце до мегаполис, 22 клона за развитие и присаждания, които смесват два от тях.",
+  f6h: "Град, който живее", f6p: "Трафик, автобуси, трамваи и хора по тротоарите; съвети, бюджети, фестивали и по някое наводнение.",
+  l1: "Обучение в началото, което можеш да пропуснеш по всяко време",
+  l2: "Свободна камера: въртене, наклон до нивото на улицата, приближаване към курсора",
+  l3: "Тераформиране, автоматично изравнени парцели и мостове от пет вида",
+  l4: "Девет езика, включително български",
+  l5: "Един ден трае 5 минути на нормална скорост и 2,5 на най-бързата",
+  l6: "Графични настройки за лаптопи и големи екрани; цял екран с F11",
+  h_inst: "Инсталиране",
+  w1: "Изтегли <b>Cityroots-Setup-2.1.2.exe</b> и го отвори.",
+  w2: "Ако Windows каже, че е защитил компютъра ти, избери <b>Още информация</b>, после <b>Изпълни въпреки това</b>. Играта още не е подписана с платен сертификат.",
+  w3: "Следвай инсталатора; CityRoots се появява в менюто „Старт“.",
+  m1: "Изтегли <b>Cityroots-2.1.2.dmg</b> и го отвори.", m2: "Плъзни <b>Cityroots</b> върху <b>Applications</b>.",
+  m3: "Първия път щракни с десния бутон върху приложението в Applications, избери <b>Open</b> и после пак <b>Open</b>. След това се отваря нормално.",
+  m_note: "macOS 10.13 или по-нов. Едно приложение за Intel и Apple Silicon.",
+  r_os: "Система", r_gpu: "Графика", r_gpu_v: "Vulkan или Metal; вградена графика на ниски или средни настройки", r_mem: "Памет", r_disk: "Диск",
+  h_cta: "Основи своя град", p_cta: "Безплатна за изтегляне и игра.", all: "Всички версии и бележки",
+  credits: "Направена с Godot. Шрифтове: Pangolin и Andika (SIL OFL)."
+};
+const EN = {};
+document.querySelectorAll("[data-i18n]").forEach(el => { EN[el.dataset.i18n] ??= el.innerHTML; });
+function setLang(l) {
+  const t = l === "bg" ? BG : EN;
+  document.documentElement.lang = l;
+  document.querySelectorAll("[data-i18n]").forEach(el => { if (t[el.dataset.i18n] != null) el.innerHTML = t[el.dataset.i18n]; });
+  document.querySelectorAll(".lang button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.set === l)));
+  try { localStorage.setItem("lang", l); } catch (e) {}
+}
+document.querySelectorAll(".lang button").forEach(b => b.addEventListener("click", () => setLang(b.dataset.set)));
+let start = "en";
+try { start = localStorage.getItem("lang") || ((navigator.language || "").startsWith("bg") ? "bg" : "en"); } catch (e) {}
+if (start === "bg") setLang("bg");
+</script>
+</body>
+</html>
